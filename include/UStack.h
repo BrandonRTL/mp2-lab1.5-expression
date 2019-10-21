@@ -114,8 +114,8 @@ int Prioritet(char s)
 	case '-': return 2;
 	case '*': return 3;
 	case '/': return 3;
-	case '(': return 1;
-	case ')': return 0;
+	case '(': return 0;
+	case ')': return 1;
 	default:
 		return -1;
 	}
@@ -169,7 +169,7 @@ std::string OPZPerevod(std::string _A) // пока что только цифр�
 				}
 				else 
 				{
-					while (!OPZ.IsEmpty() && (Prioritet(OPZ.Top() >= Prioritet(_A[i]))))
+					while (!OPZ.IsEmpty() && (Prioritet(_A[i])) <= Prioritet(OPZ.Top()))
 					{
 						OPZ2 = OPZ2 + OPZ.Pop();
 					}

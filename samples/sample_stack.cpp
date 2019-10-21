@@ -12,7 +12,7 @@ int main()
 	int x = A.FindMin();
 	cout << x; */
 	double x;
-	string A = "(3+2*(8-12))";
+	string A = "((2*(2+2)*(2+4))/(1+2/3))";
 	string B = OPZPerevod(A);
 	cout << B;
 	x = OPZSolvev2(B);
