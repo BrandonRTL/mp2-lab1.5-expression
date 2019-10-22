@@ -106,7 +106,7 @@ public:
 		return MinStack.Top();
 	}
 };
-int Prioritet(char s)
+int Priority(char s)
 {
 	switch (s)
 	{
@@ -116,128 +116,217 @@ int Prioritet(char s)
 	case '/': return 3;
 	case '(': return 0;
 	case ')': return 1;
+	case '^': return 4;
+	case 's': return 5;
 	default:
 		return -1;
 	}
 }
-
-std::string OPZPerevod(std::string _A) // пока что только цифры давайте напишем (3+2)
+bool ExpressionCheck(std::string _A)
 {
-	TStack<char> OPZ;
-	int SK = 0;
+	int Status = 0;
+	int BracketCounter = 0;
+	int PointCounter = 0;
+	bool Check = 0;
+	for (int i = 0; i <= _A.size(); i++)
+	{
+		if (Status == 4)
+			return 1;
+		if (Status == 3)
+			return 0;
+		if (Status == 2)
+		{
+			if (BracketCounter != 0)
+				return 0;
+			if (BracketCounter == 0)
+				return 1;
+		}
+		if (Status == 1)
+		{
+			if (PointCounter > 1)
+			{
+				Status = 3;
+			}
+			else if (_A[i] == 0)
+			{
+				Status = 2;
+				PointCounter = 0;
+			}
+			else if (_A[i] == 41)
+			{
+				BracketCounter--;
+				if (BracketCounter >= 0)
+					Status = 1;
+				else Status = 3;
+				PointCounter = 0;
+			}
+			else if ((_A[i] >= 48 && _A[i] <= 59))
+			{
+				Status = 1;
+				PointCounter = 0;
+			}
+			else if (_A[i] == 44)
+			{
+				PointCounter++;
+				Status = 1;
+			}
+			else if (_A[i] == '+' || _A[i] == '-' || _A[i] == 'e' || _A[i] == '^' || _A[i] == '/' || _A[i] == '*')
+			{
+				Status = 0;
+				PointCounter = 0;
+			}
+			else Status = 3;
+		}
+		else if (Status == 0)
+		{
+			if (_A[i] == 10)
+			{
+				Status = 2;
+			}
+			else if (_A[i] == 40)
+			{
+				BracketCounter++;
+				Status = 0;
+			}
+			else if ((_A[i] >= 48) && (_A[i] <= 57))
+			{
+				Status = 1;
+			}
+			else Status = 3;
+		}
+	}
+	if (Status != 3)
+		Check = 1;
+	return Check;
+}
+std::string ExpressionParse(std::string _A)
+{
+	TStack<char> Polska;
 	char tmp;
-	std::string OPZ2;
+	std::string Result;
 	for (int i = 0; i < _A.size(); i++)
 	{
-		//std::cout << "TOP " << OPZ.Top() << std::endl;
-	//	std::cout << "STRING " << OPZ2 << std::endl;
 		if (_A[i] == '(')
 		{
-			OPZ.Push(_A[i]);
-			std::cout << "WHILE V SKOBKE " << OPZ.Top() << std::endl;
+			Polska.Push(_A[i]);
 		}
 		if (_A[i] == ')')
 		{
-			while (OPZ.Top() != '(')
+			while (Polska.Top() != '(')
 			{
-				tmp = OPZ.Pop();
-				std::cout << "WHILE V SKOBKE " << OPZ.Top() << std::endl; //(2+2)
-				OPZ2 = OPZ2 + tmp;
+				tmp = Polska.Pop();
+				Result = Result + tmp;
 			}
-			OPZ.Pop();
+			Polska.Pop();
 		}
-		if (_A[i] >= 48 && _A[i] <= 59)
+		if (((_A[i] >= 48 && _A[i] <= 59))||(_A[i]== 44 ))
 		{
-			OPZ2 = OPZ2 + _A[i];
-			if (_A[i+1] < 48 || _A[i+1] > 59)
+			Result = Result + _A[i];
+			if ((_A[i + 1] < 48 || _A[i + 1] > 59) && (_A[i+1]!= 44))
 			{
-				OPZ2 = OPZ2 + '|';
+				Result = Result + '|';
 			}
 
 		}
 		if (_A[i] == '+' || _A[i] == '-' || _A[i] == 'e' || _A[i] == '^' || _A[i] == '/' || _A[i] == '*')
 		{
-			if (OPZ.IsEmpty())
+			if (Polska.IsEmpty())
 			{
-				OPZ.Push(_A[i]);
+				Polska.Push(_A[i]);
 			}
 			else
 			{
-				if (Prioritet(_A[i]) > Prioritet(OPZ.Top()))
+				if (Priority(_A[i]) > Priority(Polska.Top()))
 				{
-					OPZ.Push(_A[i]);
+					Polska.Push(_A[i]);
 				}
 				else 
 				{
-					while (!OPZ.IsEmpty() && (Prioritet(_A[i])) <= Prioritet(OPZ.Top()))
+					while (!Polska.IsEmpty() && (Priority(_A[i])) <= Priority(Polska.Top()))
 					{
-						OPZ2 = OPZ2 + OPZ.Pop();
+						Result = Result + Polska.Pop();
 					}
-					OPZ.Push(_A[i]);
+					Polska.Push(_A[i]);
 				}
 			}
 		}
 	}
-	while (!OPZ.IsEmpty())
+	while (!Polska.IsEmpty())
 	{
-		OPZ2 = OPZ2 + OPZ.Pop();
+		Result = Result + Polska.Pop();
 	}
-	return OPZ2;
+	return Result;
 }
-double OPZSolvev2(std::string _A) 
+double ExpressionSolveV2(std::string _A)
 {
 	double tmp;
-	TStack<double> OPZ;
+	TStack<double> NumbersStack;
 	int count = 0;
+	int IntegerPart = 1;
+	double mult = 0.1;
 	for (int i = 0; i < _A.size(); i++)
 	{
-		std::cout << "TOP " << OPZ.Top() << std::endl;
+		//std::cout << "TOP " << NumbersStack.Top() << std::endl;
 		switch (_A[i])
 		{
 		case '+':
-			OPZ.Push((OPZ.Pop()) + (OPZ.Pop()));
+			NumbersStack.Push((NumbersStack.Pop()) + (NumbersStack.Pop()));
 
 			break;
 		case '-':
-			tmp = OPZ.Pop();
-			OPZ.Push((OPZ.Pop()) - tmp);
+			tmp = NumbersStack.Pop();
+			NumbersStack.Push((NumbersStack.Pop()) - tmp);
 			break;
 		case '*':
-			OPZ.Push((OPZ.Pop())*(OPZ.Pop()));
+			NumbersStack.Push((NumbersStack.Pop())*(NumbersStack.Pop()));
 			break;
 		case '/':
-			tmp = OPZ.Pop();
-			OPZ.Push((OPZ.Pop()) / tmp);
+			tmp = NumbersStack.Pop();
+			NumbersStack.Push((NumbersStack.Pop()) / tmp);
 			break;
 		case 'e':
-			OPZ.Push(exp(OPZ.Pop()));
+			NumbersStack.Push(exp(NumbersStack.Pop()));
 			break;
 		case 's':
-			OPZ.Push(sin(OPZ.Pop()));
+			NumbersStack.Push(sin(NumbersStack.Pop()));
 			break;
 		case 'c':
-			OPZ.Push(cos(OPZ.Pop()));
+			NumbersStack.Push(cos(NumbersStack.Pop()));
 			break;
 		case '^':
-			OPZ.Push(pow(OPZ.Pop(), OPZ.Pop()));
+			NumbersStack.Push(pow(NumbersStack.Pop(), NumbersStack.Pop()));
 			break;
 		case '|':
 			break;
+		case ',':
+			IntegerPart = 0;
+			break;
 		default:
-			std::cout << "COUNT - cifri f 4isle " << count << std::endl;
 			if (count == 0)
 				tmp = _A[i]-48;
-			else tmp = tmp * 10 + _A[i]-48;
-			if (_A[i + 1] < 48 || _A[i + 1] > 59)
+			else
 			{
-				OPZ.Push(tmp);
+				if (IntegerPart)
+				{
+					tmp = tmp * 10 + _A[i] - 48;
+				}
+				else
+				{
+					tmp = tmp + mult * (_A[i] - 48);
+					mult = mult / 10;
+				}
+			}
+			if ((_A[i + 1] < 48 || _A[i + 1] > 59)&&(_A[i+1]!=44))
+			{
+				NumbersStack.Push(tmp);
 				count = -1;
 				tmp = 0;
+				mult = 0.1;
 			}
 			count++;
 		}
 	}
-	return OPZ.Top();
+	return NumbersStack.Top();
 }
 
 #endif
