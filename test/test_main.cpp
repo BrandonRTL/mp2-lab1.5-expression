@@ -1,5 +1,4 @@
 #include <gtest.h>
-#include <UStack.h>
 using namespace std;
 int main(int argc, char **argv)
 {

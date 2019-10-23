@@ -106,18 +106,22 @@ public:
 		return MinStack.Top();
 	}
 };
+
+
+
 int Priority(char s)
 {
 	switch (s)
 	{
 	case '+': return 2;
-	case '-': return 2;
-	case '*': return 3;
-	case '/': return 3;
+	case '-': return 3;
+	case '*': return 4;
+	case '/': return 5;
 	case '(': return 0;
 	case ')': return 1;
-	case '^': return 4;
-	case 's': return 5;
+	case '^': return 7;
+	case 's': return 8;
+	case 'e': return 10;
 	default:
 		return -1;
 	}
@@ -136,10 +140,10 @@ bool ExpressionCheck(std::string _A)
 			return 0;
 		if (Status == 2)
 		{
-			if (BracketCounter != 0)
-				return 0;
-			if (BracketCounter == 0)
+			if ((BracketCounter == 0)&&(PointCounter == 0))
 				return 1;
+			else 
+				return 0;
 		}
 		if (Status == 1)
 		{
@@ -149,8 +153,8 @@ bool ExpressionCheck(std::string _A)
 			}
 			else if (_A[i] == 0)
 			{
-				Status = 2;
-				PointCounter = 0;
+					Status = 2;
+					PointCounter = 0;
 			}
 			else if (_A[i] == 41)
 			{
@@ -169,8 +173,10 @@ bool ExpressionCheck(std::string _A)
 			{
 				PointCounter++;
 				Status = 1;
+				if (_A[i + 1] == 0)
+					Status = 3;
 			}
-			else if (_A[i] == '+' || _A[i] == '-' || _A[i] == 'e' || _A[i] == '^' || _A[i] == '/' || _A[i] == '*')
+			else if (_A[i] == '+' || _A[i] == '-' || _A[i] == '^' || _A[i] == '/' || _A[i] == '*')
 			{
 				Status = 0;
 				PointCounter = 0;
@@ -187,10 +193,17 @@ bool ExpressionCheck(std::string _A)
 			{
 				BracketCounter++;
 				Status = 0;
+
 			}
 			else if ((_A[i] >= 48) && (_A[i] <= 57))
 			{
 				Status = 1;
+			}
+			else if (_A[i] == 'e' || _A[i] == 's' || _A[i] == 'c' )
+			{
+				if (_A[i + 1] == 0)
+					Status = 4;
+				else Status = 0;
 			}
 			else Status = 3;
 		}
@@ -236,18 +249,11 @@ std::string ExpressionParse(std::string _A)
 			}
 			else
 			{
-				if (Priority(_A[i]) > Priority(Polska.Top()))
-				{
-					Polska.Push(_A[i]);
-				}
-				else 
-				{
-					while (!Polska.IsEmpty() && (Priority(_A[i])) <= Priority(Polska.Top()))
+					while (!Polska.IsEmpty()  && (Priority(_A[i])) < Priority(Polska.Top()))	
 					{
 						Result = Result + Polska.Pop();
 					}
 					Polska.Push(_A[i]);
-				}
 			}
 		}
 	}

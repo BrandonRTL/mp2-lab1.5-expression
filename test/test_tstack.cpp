@@ -1,1 +1,123 @@
+#include "UStack.h"
+
 #include <gtest.h>
+
+TEST(TExpression, can_calculate_some_easy_expression_1)
+{
+	std::string A = "2+3";
+	std::string B = ExpressionParse(A);
+
+	EXPECT_EQ(ExpressionCheck(A), 1);
+	EXPECT_EQ(ExpressionSolveV2(B), 5);
+}
+TEST(TExpression, can_calculate_some_easy_expression_2)
+{
+	std::string A = "(2+3)*6/3";
+	std::string B = ExpressionParse(A);
+
+	EXPECT_EQ(ExpressionCheck(A), 1);
+	EXPECT_EQ(ExpressionSolveV2(B), 10);
+}
+TEST(TExpression, can_calculate_some_easy_expression_3)
+{
+	std::string A = "(2^2+1)+3*((5+1)/2)";
+	std::string B = ExpressionParse(A);
+
+	EXPECT_EQ(ExpressionCheck(A), 1);
+	EXPECT_EQ(ExpressionSolveV2(B), 14);
+}
+TEST(TExpression, can_calculate_some_easy_expression_4)
+{
+	std::string A = "3+4*2/(1-5)^2^3";
+	std::string B = ExpressionParse(A);
+
+	EXPECT_EQ(ExpressionCheck(A), 1);
+	EXPECT_EQ(ExpressionSolveV2(B), 3.0001220703125);
+}
+TEST(TExpression, can_calculate_some_easy_expression_5)
+{
+	std::string A = "5^2^(2+2)";
+	std::string B = ExpressionParse(A);
+
+	EXPECT_EQ(ExpressionCheck(A), 1);
+	EXPECT_EQ(ExpressionSolveV2(B), 152587890625);
+}
+TEST(TExpression, can_calculate_expression_with_unar_operators_1)
+{
+	std::string A = "e(0)";
+	EXPECT_EQ(ExpressionCheck(A), 1);
+
+	if (ExpressionCheck(A))
+	{
+		std::string B = ExpressionParse(A);
+
+		EXPECT_EQ(ExpressionSolveV2(B), 1);
+	}
+}
+TEST(TExpression, can_calculate_expression_with_unar_operators_2)
+{
+	std::string A = "e(e(0)-e(0))";
+	EXPECT_EQ(ExpressionCheck(A), 1);
+
+	if (ExpressionCheck(A))
+	{
+		std::string B = ExpressionParse(A);
+
+		EXPECT_EQ(ExpressionSolveV2(B), 1);
+	}
+}
+
+TEST(TExpression, returns_NULL_when_incorrect_expression_1)
+{
+	std::string A = "1,";
+
+	EXPECT_EQ(ExpressionCheck(A), 0);
+}
+TEST(TExpression, returns_NULL_when_incorrect_expression_2)
+{
+	std::string A = "(1+2))";
+
+	EXPECT_EQ(ExpressionCheck(A), 0);
+}
+TEST(TExpression, returns_NULL_when_incorrect_expression_3)
+{
+	std::string A = "(1,2*2,,1))";
+
+	EXPECT_EQ(ExpressionCheck(A), 0);
+}
+TEST(TExpression, returns_NULL_when_incorrect_expression_4)
+{
+	std::string A = "(1,2*2,,1)),";
+
+	EXPECT_EQ(ExpressionCheck(A), 0);
+}
+TEST(TExpression, returns_NULL_when_incorrect_expression_5)
+{
+	std::string A = "a";
+
+	EXPECT_EQ(ExpressionCheck(A), 0);
+}
+TEST(TExpression, returns_NULL_when_incorrect_expression_6)
+{
+	std::string A = "a+b,23as";
+
+	EXPECT_EQ(ExpressionCheck(A), 0);
+}
+TEST(TExpression, returns_1_when_correct_expression_1)
+{
+	std::string A = "1,1";
+
+	EXPECT_EQ(ExpressionCheck(A), 1);
+}
+TEST(TExpression, returns_1_when_correct_expression_2)
+{
+	std::string A = "(1+2)";
+
+	EXPECT_EQ(ExpressionCheck(A), 1);
+}
+TEST(TExpression, returns_1_when_correct_expression_3)
+{
+	std::string A = "(1,2*2,1)";
+
+	EXPECT_EQ(ExpressionCheck(A), 1);
+}
