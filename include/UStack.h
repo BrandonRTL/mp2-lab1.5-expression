@@ -2,9 +2,11 @@
 #define __TSTACK_H__
 #include <string>
 #include <vector>
+#include<stack>
+#include<iostream>
 #include <math.h>
 const int MAX_STACK_SIZE = 100000000;
-
+std::string Functions[4] = { "cos", "sin", "exp", "ln" };
 template <class ValType>
 class TStack
 {
@@ -13,26 +15,10 @@ protected:
 	int Size;
 	int Count;
 public:
-	TStack(int _Size = 13)
-	{
-		Size = _Size;
-		pVector = new ValType[Size];
-		Count = 0;
-	}
-	~TStack()
-	{
-		delete[] pVector;
-	}
-	TStack(const TStack<ValType> &v)
-	{
-		Size = v.Size;
-		Count = v.Count;
-		pVector = new ValType[v.Size];
-		for (int i = 0; i < Size; i++)
-		{
-			pVector[i] = v.pVector[i];
-		}
-	}
+	TStack(int _Size = 13);
+	TStack(const TStack<ValType> &v);
+	void Push(const ValType &v);
+	ValType Pop();
 	bool IsEmpty()
 	{
 		return (Count == 0);
@@ -41,33 +27,385 @@ public:
 	{
 		return (Count == Size);
 	}
-	void Push(const ValType &v)
-	{
-		if (IsFool())
-		{
-			ValType* _pVector;
-			_pVector = new ValType(4 / 3 * Size);
-			for (int i = 0; i < Size; i++)
-				_pVector[i] = pVector[i];
-			pVector = _pVector;
-		}
-		pVector[Count + 1] = v;
-		Count++;
-	}
 	ValType Top()
 	{
 		return pVector[Count];
 	}
-	ValType Pop()
+	~TStack()
 	{
-		if (IsEmpty())
-		{
-			return 0;
-		}
-		Count--;
-		return pVector[Count + 1];
+		delete[] pVector;
 	}
 };
+template<typename ValType>
+TStack<ValType>::TStack(int _Size = 13)
+{
+	if (_Size < 0 || _Size > MAX_STACK_SIZE)
+	{
+		throw "Incorrect size";
+	}
+	Size = _Size;
+	pVector = new ValType[Size];
+	Count = 0;
+}
+template<typename ValType>
+TStack<ValType>::TStack(const TStack<ValType> &v)
+{
+	Size = v.Size;
+	Count = v.Count;
+	pVector = new ValType[v.Size];
+	for (int i = 0; i < Size; i++)
+	{
+		pVector[i] = v.pVector[i];
+	}
+}
+template<typename ValType>
+ValType TStack<ValType>::Pop()
+{
+	if (IsEmpty())
+	{
+		throw "Cant throw empty stack";
+	}
+	Count--;
+	return pVector[Count + 1];
+}
+template<typename ValType>
+void TStack<ValType>::Push(const ValType &v)
+{
+	if (IsFool())
+	{
+		ValType* _pVector;
+		_pVector = new ValType(4 / 3 * Size);
+		for (int i = 0; i < Size; i++)
+			_pVector[i] = pVector[i];
+		pVector = _pVector;
+	}
+	pVector[Count + 1] = v;
+	Count++;
+}
+
+
+
+int Priority(std::string s)
+{
+	switch (s[0])
+	{
+	case '+': return 2;
+	case '-': return 3;
+	case '*': return 4;
+	case '/': return 4;
+	case '(': return 0;
+	case ')': return 1;
+	case '^': return 7;
+	case 's': return 8;
+	case 'c': return 8;
+	case 'e': return 10;
+	default:
+		return -1;
+	}
+}
+bool IsFunction(std::string A)
+{
+	bool flag = 0;
+	for (int i = 0; i < 3; i++)
+	{
+		if (A == Functions[i])
+			flag = 1;
+	}
+	return flag;
+}
+bool IsBinary(std::string A)
+{
+	bool flag = 0;
+	if (A == "+" || A == "-" || A == "^" || A == "*" || A == "/")
+		flag = 1;
+	return flag;
+}
+bool IsNumber(std::string A)
+{
+	bool flag = 0;
+	if (A[0] >= 48 && A[0] <= 57)
+		flag = 1;
+	return flag;
+}
+bool IsVariable(std::string _A)
+{
+	bool flag = 0;
+	if ((_A.size() == 1) && (_A[0] >= 97 && _A[0] <= 122))
+		flag = 1;
+	return flag;
+
+}
+std::vector<std::string> StringToVector(std::string A)
+{
+	std::vector<std::string> Result;
+	std::string Tmp;
+	int Status = 0;
+	int BracketCounter = 0;
+	int PointCounter = 0;
+	bool Check = 0;
+	for (int i = 0; i < A.size(); i++)
+	{
+		if ((A[i] >= 48 && A[i] <= 59) || A[i] == '.')
+		{
+			if (A[i] == '.')
+			{
+				PointCounter++;
+				if (A[i + 1] < 48 || A[i + 1] > 59)
+					Status = 4;
+			}
+			if (PointCounter > 1)
+				Status = 4;
+			Tmp = Tmp + A[i];
+			if ((A[i + 1] < 48 || A[i + 1] > 59) && A[i + 1] != '.')
+			{
+				Result.push_back(Tmp);
+				PointCounter = 0;
+				Tmp.clear();
+			}
+		}
+		else if (A[i] == '(')
+		{
+			Result.push_back("(");
+		}
+		else if (A[i] == ')')
+		{
+			Result.push_back(")");
+		}
+		else if ((A[i] == 'e') && (A[i + 1] == 'x') && (A[i + 2] == 'p'))
+		{
+			Result.push_back("exp");
+			i = i + 2;
+		}
+		else if ((A[i] == 's') && (A[i + 1] == 'i') && (A[i + 2] == 'n'))
+		{
+			Result.push_back("sin");
+			i = i + 2;
+		}
+		else if ((A[i] == 'c') && (A[i + 1] == 'o') && (A[i + 2] == 's'))
+		{
+			Result.push_back("cos");
+			i = i + 2;
+		}
+		else if (A[i] >= 97 && A[i] <= 122 & (A[i + 1] < 97 || A[i + 1] > 122))
+		{
+			Tmp = Tmp + A[i];
+			Result.push_back(Tmp);
+			Tmp.clear();
+		}
+		else if (A[i] == '+' || A[i] == '-' || A[i] == '*' || A[i] == '/' || A[i] == '^')
+		{
+			Tmp = Tmp + A[i];
+			Result.push_back(Tmp);
+			Tmp.clear();
+		}
+		else
+		{
+			std::cout << "Symbol " << A[i] << " is not correct" << std::endl;
+			Status = 4;
+		}
+	}
+	if (Status == 4)
+		throw "Not correct";
+	for (int i = 0; i < Result.size(); i++)
+	{
+		if (Status == 4)
+			throw "Not correct";
+		else if (Status == 0)
+		{
+			if (Result[i] == "(")
+			{
+				BracketCounter++;
+				Status = 0;
+			}
+			else if (IsNumber(Result[i]) || IsVariable(Result[i]))
+			{
+				Status = 1;
+			}
+			else if (IsFunction(Result[i]))
+			{
+				Status = 2;
+				if (i == Result.size() - 1)
+					Status = 4;
+			}
+			else
+			{
+				Status = 4;
+			}
+		}
+		else if (Status == 1)
+		{
+			if (Result[i] == ")")
+			{
+				BracketCounter--;
+				if (BracketCounter < 0)
+					Status = 4;
+			}
+			else if (IsBinary(Result[i]))
+			{
+				Status = 0;
+			}
+			else
+			{
+				Status = 4;
+			}
+		}
+		else if (Status == 2)
+		{
+			if (Result[i] == "(")
+			{
+				BracketCounter++;
+				Status = 0;
+			}
+			else if (IsNumber(Result[i]) || IsVariable(Result[i]))
+			{
+				Status = 1;
+			}
+		}
+	}
+	if (Status == 4)
+		throw "Something in your expressiong is wrong";
+	return Result;
+}
+std::vector<std::string> ExpressionParsev2(std::vector<std::string> _A)
+{
+	std::vector<std::string> Result;
+	std::stack<std::string> Funcs;
+	std::string Tmp;
+	for (int i = 0; i < _A.size(); i++)
+	{
+		if (_A[i] == "(")
+		{
+			Funcs.push(_A[i]);
+		}
+		if (_A[i] == ")")
+		{
+			while (Funcs.top() != "(")
+			{
+				Result.push_back(Funcs.top());
+				Funcs.pop();
+			}
+			Funcs.pop();
+		}
+		if ((IsNumber(_A[i]) || (IsVariable(_A[i]))))
+		{
+			Result.push_back(_A[i]);
+		}
+		if (IsBinary(_A[i]) || IsFunction(_A[i]))
+		{
+			if (Funcs.empty())
+			{
+				Funcs.push(_A[i]);
+			}
+			else
+			{
+				while (!Funcs.empty() && (Priority(_A[i]) < Priority(Funcs.top())))
+				{
+					Result.push_back(Funcs.top());
+					Funcs.pop();
+				}
+				Funcs.push(_A[i]);
+			}
+		}
+	}
+	while (!Funcs.empty())
+	{
+		Result.push_back(Funcs.top());
+		Funcs.pop();
+	}
+
+	return Result;
+}
+double ExpressiongSolve(std::vector<std::string> _A)
+{
+	double tmp;
+	std::stack<double> NumbersStack;
+	int count = 0;
+	for (int i = 0; i < _A.size(); i++)
+	{
+		if (IsVariable(_A[i]))
+		{
+			std::cout << "What is the value of: " << _A[i] << std::endl;
+			std::cin >> tmp;
+			for (int j = i + 1; j < _A.size(); j++)
+			{
+				if (_A[i] == _A[j])
+				{
+					_A[j] = std::to_string(tmp);
+				}
+			}
+			_A[i] = std::to_string(tmp);
+		}
+	}
+	for (int i = 0; i < _A.size(); i++)
+	{
+		if (IsNumber(_A[i]))
+		{
+			tmp = stod(_A[i]);
+			NumbersStack.push(tmp);
+		}
+		if (_A[i] == "+")
+		{
+			tmp = NumbersStack.top();
+			NumbersStack.pop();
+			tmp = tmp + NumbersStack.top();
+			NumbersStack.pop();
+			NumbersStack.push(tmp);
+		}
+		if (_A[i] == "-")
+		{
+			tmp = NumbersStack.top();
+			NumbersStack.pop();
+			tmp = -tmp + NumbersStack.top();
+			NumbersStack.pop();
+			NumbersStack.push(tmp);
+		}
+		if (_A[i] == "*")
+		{
+			tmp = NumbersStack.top();
+			NumbersStack.pop();
+			tmp = tmp * NumbersStack.top();
+			NumbersStack.pop();
+			NumbersStack.push(tmp);
+		}
+		if (_A[i] == "/")
+		{
+			tmp = NumbersStack.top();
+			NumbersStack.pop();
+			tmp = NumbersStack.top() / tmp;
+			NumbersStack.pop();
+			NumbersStack.push(tmp);
+		}
+		if (_A[i] == "^")
+		{
+			tmp = NumbersStack.top();
+			NumbersStack.pop();
+			tmp = pow(NumbersStack.top(), tmp);
+			NumbersStack.pop();
+			NumbersStack.push(tmp);
+		}
+		if (_A[i] == "sin")
+		{
+			tmp = sin(NumbersStack.top());
+			NumbersStack.pop();
+			NumbersStack.push(tmp);
+		}
+		if (_A[i] == "cos")
+		{
+			tmp = cos(NumbersStack.top());
+			NumbersStack.pop();
+			NumbersStack.push(tmp);
+		}
+		if (_A[i] == "exp")
+		{
+			tmp = exp(NumbersStack.top());
+			NumbersStack.pop();
+			NumbersStack.push(tmp);
+		}
+	}
+	return NumbersStack.top();
+}
+
+
 template <class ValType>
 class TMinStack
 {
@@ -109,13 +447,16 @@ public:
 
 
 
+
+
+
 int Priority(char s)
 {
 	switch (s)
 	{
 	case '+': return 2;
 	case '-': return 3;
-	case '*': return 4;
+	case '*': return 3;
 	case '/': return 5;
 	case '(': return 0;
 	case ')': return 1;

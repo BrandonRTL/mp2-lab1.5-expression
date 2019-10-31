@@ -12,11 +12,13 @@ int main()
 	int x = A.FindMin();
 	cout << x; */
 	double x;
-	string A = "((2*(2+2)*(2+4))/(1+2/3))";
-	string B = OPZPerevod(A);
+	string A = "2+e(e(1)/e(1)-1)";
+	bool a = ExpressionCheck(A);
+	cout  << a << endl;
+	string B = ExpressionParse(A);
 	cout << B;
-	x = OPZSolvev2(B);
-	cout << x;
+	x = ExpressionSolveV2(B);
+	cout << endl << x;
 	cin >> x;
 	return 0;
 }
