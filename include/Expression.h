@@ -21,6 +21,7 @@ int Priority(std::string s)
 	case 's': return 8;
 	case 'c': return 8;
 	case 'e': return 10;
+	case 'U': return 6;
 	default:
 		return -1;
 	}
@@ -45,7 +46,7 @@ bool IsBinary(std::string A)
 bool IsNumber(std::string A)
 {
 	bool flag = 0;
-	if (A[0] >= 48 && A[0] <= 57)
+	if ((A[0] == '-' && A[1] >= 48 && A[1] <= 57) || ((A[0] >= 48 && A[0] <= 57)))
 		flag = 1;
 	return flag;
 }
@@ -154,6 +155,13 @@ std::vector<std::string> StringToVector(std::string A)
 				if (i == Result.size() - 1)
 					Status = 4;
 			}
+			else if (Result[i] == "-")
+			{
+				Result[i] = "Unarminus-"; // если читать как одно слово с ударением на А, то похоже на заклинание
+				Status = 3;
+				if (i == Result.size() - 1)
+					Status = 4;
+			}
 			else
 			{
 				Status = 4;
@@ -186,7 +194,33 @@ std::vector<std::string> StringToVector(std::string A)
 			else 
 				throw "function operator should be written in brackets";
 		}
+		else if (Status == 3)
+		{
+			if (Result[i] == "(")
+			{
+				BracketCounter++;
+				Status = 0;
+			}
+			else if (IsBinary(Result[i]))
+			{
+				Status = 0;
+			}
+			else if (IsFunction(Result[i]))
+			{
+				Status = 2;
+				if (i == Result.size() - 1)
+					Status = 4;
+			}
+			else if (IsNumber(Result[i]) || IsVariable(Result[i]))
+			{
+				Status = 1;
+			}
+			else
+				Status = 4;
+		}
 	}
+//	for (int i = 0; i < Result.size(); i++)
+//		std::cout << Result[i] << std::endl;
 	if (Status == 4)
 		throw "Something in your expressiong is wrong";
 	return Result;
@@ -196,8 +230,10 @@ std::vector<std::string> ExpressionParsev2(std::vector<std::string> _A)
 	std::vector<std::string> Result;
 	std::stack<std::string> Funcs;
 	std::string Tmp;
+//	std::cout  << std::endl << std::endl << std::endl << std::endl;
 	for (int i = 0; i < _A.size(); i++)
 	{
+//		std::cout << _A[i] << "  "<< i << std::endl;
 		if (_A[i] == "(")
 		{
 			Funcs.push(_A[i]);
@@ -215,7 +251,7 @@ std::vector<std::string> ExpressionParsev2(std::vector<std::string> _A)
 		{
 			Result.push_back(_A[i]);
 		}
-		if (IsBinary(_A[i]) || IsFunction(_A[i]))
+		if (IsBinary(_A[i]) || IsFunction(_A[i])|| _A[i] == "Unarminus-")
 		{
 			if (Funcs.empty())
 			{
@@ -237,7 +273,6 @@ std::vector<std::string> ExpressionParsev2(std::vector<std::string> _A)
 		Result.push_back(Funcs.top());
 		Funcs.pop();
 	}
-
 	return Result;
 }
 double ExpressiongSolve(std::vector<std::string> _A)
@@ -305,6 +340,12 @@ double ExpressiongSolve(std::vector<std::string> _A)
 			tmp = NumbersStack.top();
 			NumbersStack.pop();
 			tmp = pow(NumbersStack.top(), tmp);
+			NumbersStack.pop();
+			NumbersStack.push(tmp);
+		}
+		if (_A[i] == "Unarminus-")
+		{
+			tmp = -(NumbersStack.top());
 			NumbersStack.pop();
 			NumbersStack.push(tmp);
 		}

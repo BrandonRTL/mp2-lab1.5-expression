@@ -153,6 +153,38 @@ TEST(TExpressionV2, can_calculate_some_easy_expression_4)
 
 	EXPECT_EQ(22, ExpressiongSolve(B));
 }
+TEST(TExpressionV2, can_calculate_some_unarminus_expression_1)
+{
+	std::string A = "-2";
+	std::vector<std::string> B = StringToVector(A);
+	B = ExpressionParsev2(B);
+
+	EXPECT_EQ(-2, ExpressiongSolve(B));
+}
+TEST(TExpressionV2, can_calculate_some_unarminus_expression_2)
+{
+	std::string A = "-(5+6)*2";
+	std::vector<std::string> B = StringToVector(A);
+	B = ExpressionParsev2(B);
+
+	EXPECT_EQ(-22, ExpressiongSolve(B));
+}
+TEST(TExpressionV2, can_calculate_some_unarminus_expression_3)
+{
+	std::string A = "-sin(0)";
+	std::vector<std::string> B = StringToVector(A);
+	B = ExpressionParsev2(B);
+
+	EXPECT_EQ(0, ExpressiongSolve(B));
+}
+TEST(TExpressionV2, can_calculate_some_unarminus_expression_4)
+{
+	std::string A = "exp(1)+(-exp(1))";
+	std::vector<std::string> B = StringToVector(A);
+	B = ExpressionParsev2(B);
+
+	EXPECT_EQ(0, ExpressiongSolve(B));
+}
 TEST(TExpressionV2, throws_when_incorrect_expression_1)
 {
 	std::string A = "(1.2*2.1))";
