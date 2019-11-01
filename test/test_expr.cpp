@@ -201,6 +201,24 @@ TEST(TExpressionV2, can_calculate_expression_2)
 
 	EXPECT_EQ(5, ExpressiongSolve(B));
 }
+TEST(TExpressionV2, can_calculate_expression_3)
+{
+	std::string A = "((-65)^2-56^2)^(1/2)";
+	std::vector<std::string> B = StringToVector(A);
+	B = ExpressionParsev2(B);
+
+	EXPECT_EQ(33, ExpressiongSolve(B));
+}
+TEST(TExpressionV2, can_calculate_expression_4)
+{
+	std::string A = "((2*7^(1/2))^2)/4";
+	std::vector<std::string> B = StringToVector(A);
+	B = ExpressionParsev2(B);
+
+	EXPECT_EQ(7, int(ExpressiongSolve(B)));
+}
+
+
 TEST(TExpressionV2, throws_when_incorrect_expression_1)
 {
 	std::string A = "(1.2*2.1))";
