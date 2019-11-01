@@ -7,7 +7,7 @@ int main()
 {
 	double x;
 	string A = "2+e(e(1)/e(1)-1)";
-	string D = "cos(sin(xyx123))";
+	string D = "1--1";
 	vector<string> C;
 	bool a = ExpressionCheck(A);
 	cout  << a << endl;

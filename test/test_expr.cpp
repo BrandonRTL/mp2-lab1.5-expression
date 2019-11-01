@@ -255,6 +255,12 @@ TEST(TExpressionV2, throws_when_incorrect_expression_6)
 
 	EXPECT_ANY_THROW(std::vector<std::string> B = StringToVector(A));
 }
+TEST(TExpressionV2, throws_when_incorrect_expression_7)
+{
+	std::string A = "--1";
+
+	EXPECT_ANY_THROW(std::vector<std::string> B = StringToVector(A));
+}
 
 
 

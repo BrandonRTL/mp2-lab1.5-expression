@@ -208,6 +208,10 @@ std::vector<std::string> StringToVector(std::string A)
 				BracketCounter++;
 				Status = 0;
 			}
+			else if (Result[i] == "-")
+			{
+				Status = 4;
+			}
 			else if (IsBinary(Result[i]))
 			{
 				Status = 0;
