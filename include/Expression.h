@@ -58,6 +58,13 @@ bool IsVariable(std::string _A)
 	return flag;
 
 }
+bool IsLeftAssoc(std::string _A)
+{
+	bool flag = 1;
+	if (_A == "Unirminus-" || _A == "^")
+		flag = 0;
+	return flag;
+}
 std::vector<std::string> StringToVector(std::string A)
 {
 	std::vector<std::string> Result;
@@ -259,7 +266,8 @@ std::vector<std::string> ExpressionParsev2(std::vector<std::string> _A)
 			}
 			else
 			{
-				while (!Funcs.empty() && (Priority(_A[i]) < Priority(Funcs.top())))
+				while (!Funcs.empty() && (IsLeftAssoc(_A[i]) && Priority(_A[i]) <= Priority(Funcs.top()))
+					|| (!IsLeftAssoc(_A[i]) && Priority(_A[i]) < Priority(Funcs.top())))
 				{
 					Result.push_back(Funcs.top());
 					Funcs.pop();

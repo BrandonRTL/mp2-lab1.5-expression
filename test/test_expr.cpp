@@ -121,7 +121,7 @@ TEST(TExpression, returns_1_when_correct_expression_3)
 }
 
 
-TEST(TExpressionV2, can_calculate_some_easy_expression_1)
+TEST(TExpressionV2, can_calculate_simple_expression_1)
 {
 	std::string A = "(2^2+1)+3*((5+1)/2)";
 	std::vector<std::string> B = StringToVector(A);
@@ -129,7 +129,7 @@ TEST(TExpressionV2, can_calculate_some_easy_expression_1)
 
 	EXPECT_EQ(14, ExpressiongSolve(B));
 }
-TEST(TExpressionV2, can_calculate_some_easy_expression_2)
+TEST(TExpressionV2, can_calculate_simple_expression_2)
 {
 	std::string A = "5^2^(2+2)";
 	std::vector<std::string> B = StringToVector(A);
@@ -137,7 +137,7 @@ TEST(TExpressionV2, can_calculate_some_easy_expression_2)
 
 	EXPECT_EQ(152587890625, ExpressiongSolve(B));
 }
-TEST(TExpressionV2, can_calculate_some_easy_expression_3)
+TEST(TExpressionV2, can_calculate_simple_expression_3)
 {
 	std::string A = "exp(exp(0)-exp(0))";
 	std::vector<std::string> B = StringToVector(A);
@@ -153,15 +153,15 @@ TEST(TExpressionV2, can_calculate_some_easy_expression_4)
 
 	EXPECT_EQ(22, ExpressiongSolve(B));
 }
-TEST(TExpressionV2, can_calculate_some_unarminus_expression_1)
+TEST(TExpressionV2, can_calculate_unarminus_expression_1)
 {
-	std::string A = "-2";
+	std::string A = "-(2.000+1)^3*(2+2)/(4*3)";
 	std::vector<std::string> B = StringToVector(A);
 	B = ExpressionParsev2(B);
 
-	EXPECT_EQ(-2, ExpressiongSolve(B));
+	EXPECT_EQ(-9, ExpressiongSolve(B));
 }
-TEST(TExpressionV2, can_calculate_some_unarminus_expression_2)
+TEST(TExpressionV2, can_calculate_unarminus_expression_2)
 {
 	std::string A = "-(5+6)*2";
 	std::vector<std::string> B = StringToVector(A);
@@ -169,7 +169,7 @@ TEST(TExpressionV2, can_calculate_some_unarminus_expression_2)
 
 	EXPECT_EQ(-22, ExpressiongSolve(B));
 }
-TEST(TExpressionV2, can_calculate_some_unarminus_expression_3)
+TEST(TExpressionV2, can_calculate_unarminus_expression_3)
 {
 	std::string A = "-sin(0)";
 	std::vector<std::string> B = StringToVector(A);
@@ -177,13 +177,29 @@ TEST(TExpressionV2, can_calculate_some_unarminus_expression_3)
 
 	EXPECT_EQ(0, ExpressiongSolve(B));
 }
-TEST(TExpressionV2, can_calculate_some_unarminus_expression_4)
+TEST(TExpressionV2, can_calculate_unarminus_expression_4)
 {
 	std::string A = "exp(1)+(-exp(1))";
 	std::vector<std::string> B = StringToVector(A);
 	B = ExpressionParsev2(B);
 
 	EXPECT_EQ(0, ExpressiongSolve(B));
+}
+TEST(TExpressionV2, can_calculate_expression_1)
+{
+	std::string A = "((2+3/4)/1.1+(3+1/3))/(2.5-0.4*10/3)*(7/5)-((2+1/6+4.5)*0.375)/(2.75-1-1/2)";
+	std::vector<std::string> B = StringToVector(A);
+	B = ExpressionParsev2(B);
+
+	EXPECT_EQ(5, ExpressiongSolve(B));
+}
+TEST(TExpressionV2, can_calculate_expression_2)
+{
+	std::string A = "((2+38/45-1/15)/(13+8/9)+((3+3/65)*26/99))/((18.5-13-7/9)*1/85)*(1/9)+3"; 
+	std::vector<std::string> B = StringToVector(A);
+	B = ExpressionParsev2(B);
+
+	EXPECT_EQ(5, ExpressiongSolve(B));
 }
 TEST(TExpressionV2, throws_when_incorrect_expression_1)
 {
